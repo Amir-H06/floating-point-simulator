@@ -1,6 +1,4 @@
 from ..arithmetic import ieee754
-from itertools import product
-import math
 import sys
 
 
@@ -10,11 +8,13 @@ log_file = open("checker.log","w")
 
 sys.stdout = log_file
 
+
 def normalize_sig(c, nbits):
   if c.bit_length() < nbits:
     return c << (nbits - c.bit_length())
   else:
     return c
+
 
 def get_bit_range(x, start, end):
   masklen = end - start
@@ -152,7 +152,7 @@ def checker2file(a,b,c, ctx):
   print(f'a: {bin(fpa[0]), bin(fpa[1]), bin(fpa[2]), bin(fpa[3]), bin(fpa[4]), bin(fpa[5])} - {render_element(a)} - {ieee754.show_bitpattern(a)}')
   print(f'b: {bin(fpb[0]), bin(fpb[1]), bin(fpb[2]), bin(fpb[3])} - {render_element(b)} - {ieee754.show_bitpattern(b)}')
   print(f'c: {bin(fpc[0]), bin(fpc[1])} - {render_element(c)} - {ieee754.show_bitpattern(c)}')
-  print(f'Case 2 Checks: {(fpb[1]+fpc[0]) >= 2**c.ctx.p}, {((fpb[1] - fpa[1]) + fpc[0]) >= 2**c.ctx.p}, {(fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0))}, {(((fpa[5] == 0) and fpa[4] and (fpb[3] ^ fpc[1])) or (fpa[5] > 0 and (fpa[4] or (fpb[3] ^ fpc[1]))))}')
+  print(f'Case 2 Checks: {(fpb[1]+fpc[0]) >= 2**c.ctx.p}, {((fpb[1] - fpa[1]) + fpc[0]) >= 2**c.ctx.p}, {(fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0))}, {(not fpa[4]) or (fpb[3] ^ fpc[1])}')
   print(f'{fpa[5] > 0}, {fpa[5] == 0}')
   print(f'Associative?:, {check(a,b,c,1, ctx)}')
   print(f'LHS (a+b): {float(a.add(b, ctx))}, {render_element(a.add(b, ctx))!s:<20}{ieee754.show_bitpattern(a.add(b, ctx))}')
