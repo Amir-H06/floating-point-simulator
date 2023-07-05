@@ -6,7 +6,7 @@ import sys
 
 old_stdout = sys.stdout
 
-log_file = open("checked.log","w")
+log_file = open("checker.log","w")
 
 sys.stdout = log_file
 
@@ -104,7 +104,7 @@ def renderfp(a):
   return f'{render_element(a)!s:<20}{ieee754.show_bitpattern(a)}'
 
 
-"""def checker(a,b,c, ctx):
+def checker(a,b,c, ctx):
   fpa, fpb, fpc = splitsignif(a,b,c)
   
   print('DEBUG: ')
@@ -143,7 +143,7 @@ def renderfp(a):
   print(f'Az > 0 || bk ^ c0 {fpa[4] > 0 or fpb[3] ^ fpc[1]}')
 
   print(f'{eval(check(a,b,c,1, ctx), 0, 1)}')
-  print(f'{evaly, evaln}')"""
+  print(f'{evaly, evaln}')
 
 def checker2file(a,b,c, ctx):
   fpa, fpb, fpc = splitsignif(a,b,c)
@@ -152,7 +152,7 @@ def checker2file(a,b,c, ctx):
   print(f'a: {bin(fpa[0]), bin(fpa[1]), bin(fpa[2]), bin(fpa[3]), bin(fpa[4]), bin(fpa[5])} - {render_element(a)} - {ieee754.show_bitpattern(a)}')
   print(f'b: {bin(fpb[0]), bin(fpb[1]), bin(fpb[2]), bin(fpb[3])} - {render_element(b)} - {ieee754.show_bitpattern(b)}')
   print(f'c: {bin(fpc[0]), bin(fpc[1])} - {render_element(c)} - {ieee754.show_bitpattern(c)}')
-  print(f'Case 2 Checks: {(fpb[1]+fpc[0]) >= 2**c.ctx.p}, {((fpb[1] - fpa[1]) + fpc[1]) >= 2**c.ctx.p}, {fpb[2] > fpa[2]} ')
+  print(f'Case 2 Checks: {(fpb[1]+fpc[0]) >= 2**c.ctx.p}, {((fpb[1] - fpa[1]) + fpc[0]) >= 2**c.ctx.p}, {(fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0))}, {(((fpa[5] == 0) and fpa[4] and (fpb[3] ^ fpc[1])) or (fpa[5] > 0 and (fpa[4] or (fpb[3] ^ fpc[1]))))}')
   print(f'{fpa[5] > 0}, {fpa[5] == 0}')
   print(f'Associative?:, {check(a,b,c,1, ctx)}')
   print(f'LHS (a+b): {float(a.add(b, ctx))}, {render_element(a.add(b, ctx))!s:<20}{ieee754.show_bitpattern(a.add(b, ctx))}')
@@ -161,33 +161,48 @@ def checker2file(a,b,c, ctx):
   print(f'RHS: a + (b + c): {float(a.add(b.add(c, ctx), ctx))}, {render_element(a.add(b.add(c, ctx), ctx))!s:<20}{ieee754.show_bitpattern(a.add(b.add(c, ctx), ctx))}\n')
 
 #a.add(b, ctx).add(c, ctx)
-
+print('test')
 nbits = 8
 f8_rtz = ieee754.ieee_ctx(es=3, nbits=nbits, rm=ieee754.RM.ROUND_TO_ZERO)
 
 end = False
+v = True
 
-with open("errors.log", "r") as file:
-    for line in file:
-        i, j, k = line.strip().split()
+if v == True:
+  with open("error.log", "r") as file:
+      for line in file:
+          i, j, k = line.strip().split()
 
-        if i.lower() == 'end' or j.lower() == 'end' or k.lower() == 'end':
-            end = True
-            break
-        else:
-            a = ieee754.bits_to_digital(int(i), f8_rtz)
-            b = ieee754.bits_to_digital(int(j), f8_rtz)
-            c = ieee754.bits_to_digital(int(k), f8_rtz)
-            checker2file(a, b, c, f8_rtz)
+          if i.lower() == 'end' or j.lower() == 'end' or k.lower() == 'end':
+              end = True
+              break
+          else:
+              a = ieee754.bits_to_digital(int(i), f8_rtz)
+              b = ieee754.bits_to_digital(int(j), f8_rtz)
+              c = ieee754.bits_to_digital(int(k), f8_rtz)
+              checker2file(a, b, c, f8_rtz)
+else:
+  while end == False:
+    i, j, k = input('Enter 3 integers ').split()
+
+    if i.lower() == 'end' or j.lower() == 'end' or k.lower() == 'end':
+        end = True
+    else:
+        a = ieee754.bits_to_digital(int(i), f8_rtz)
+        b = ieee754.bits_to_digital(int(j), f8_rtz)
+        c = ieee754.bits_to_digital(int(k), f8_rtz)
+        checker(a, b, c, f8_rtz)
 
 
-sys.stdout = old_stdout
+
+
+"""sys.stdout = old_stdout
 log_file.close()
 
 fpa, fpb, fpc = splitsignif(a,b,c)
 p = c.ctx.p
 k = c.e - b.e
-h = c.e - a.e
+h = c.e - a.e"""
 
 #27 49 68
 

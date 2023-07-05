@@ -5,7 +5,7 @@ import logging
 import sys
 import time
 
-logging.basicConfig(filename=r'errors.log',level=logging.DEBUG)
+logging.basicConfig(filename=r'error.log',level=logging.DEBUG)
 
 
 
@@ -76,6 +76,15 @@ def checkcarry(x,y,n, generated=False):
       if (x < 2**n and y < 2**n):
         return (x+y) >= 2**n
 
+def checkshrink(x,y,n, generated=False):
+  """  assert (x > 0 and y > 0)
+    assert x.bit_length() <= n and y.bit_length() <= n"""
+  # x and y must be greater than 0, and the bit length of the two numbers should be less than the length of the significand (depends)#
+  # returns whether the bit length of x+y is greater than the length of the significand (generate has occurred)
+  if x > 0 and y > 0: 
+      if (x < 2**n and y < 2**n):
+        return (x+y) <= 2**n
+
 def checklessthan(x,y):
   return x < y
 
@@ -145,23 +154,25 @@ def case2(a,b,c, f8_rtz, p, k, h, i, j, l):
 
   totals[2] += 1
   if checkcarry(fpb[1], fpc[0], p): #generate
-    if checkcarry(fpb[1] - fpa[1], fpc[1], p): #generate
+    if checkcarry(fpb[1] - fpa[1], fpc[0], p): #generate
       if (fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0)): #case 2.8
         eval(check(a,b,c,f8_rtz,2,8), (not fpa[4]) or (fpb[3] ^ fpc[1]), 2, 8)
       else:
-        eval(check(a,b,c,f8_rtz,2,7), (((fpa[5]==0) and fpa[4] and (fpb[3] ^ fpc[1])) or (fpa[5] > 0 and fpa[4] or (fpb[4] ^ fpc[1]))), 2, 7)
+        if not eval(check(a,b,c,f8_rtz,2,7), (((fpa[5] == 0) and fpa[4] and (fpb[3] ^ fpc[1])) or (fpa[5] > 0 and (fpa[4] or (fpb[3] ^ fpc[1])))), 2, 7):
+          print(i,j,l, (fpb[1]-fpa[1]).bit_length(), (fpc[1]).bit_length(), (fpc[1] + fpb[1] - fpa[1]).bit_length(), (fpb[1] + fpc[1]).bit_length(), check(a,b,c,f8_rtz,2,5))
+          logging.debug('%s %s %s', i, j, l)
     else:
       if (fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0)):
         eval(check(a,b,c,f8_rtz,2,6), fpb[3] ^ fpc[1], 2, 6)
       else:
-        if not eval(check(a,b,c,f8_rtz,2,5), fpa[5] > 0 or fpb[3] ^ fpc[1], 2, 5):
-          print(i,j,l)
-          logging.debug('%s %s %s', i, j, l)
+        eval(check(a,b,c,f8_rtz,2,5), fpa[5] > 0 or fpb[3] ^ fpc[1], 2, 5)
+
 
   else:
-    if checkcarry(fpb[1] - fpa[1], fpc[1], p):
+    if checkcarry(fpb[1] - fpa[1], fpc[0], p):
       if (fpa[2] > fpb[2] or (fpb[2] == fpa[2] and fpa[3] > 0)):
         eval(check(a,b,c,f8_rtz,2,4), 1, 2, 4)
+
       else: 
         eval(check(a,b,c,f8_rtz,2,3), 1, 2, 3)
     else:
