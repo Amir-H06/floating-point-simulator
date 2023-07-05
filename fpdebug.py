@@ -21,70 +21,71 @@ def get_bit_range(x, start, end):
   mask = (1 << masklen) - 1
   return (x >> start) & mask
 
-def splitsignif(a,b,c):
-  p = c.ctx.p
-  k = c.e - b.e
-  h = c.e - a.e
-  assert p == a.ctx.p == b.ctx.p
-  c1 = normalize_sig(c.c, p)
-  c0 = get_bit_range(c1, 0, 1)
+def splitsignif(a, b, c):
+    p = c.ctx.p
+    k = c.e - b.e
+    h = c.e - a.e
+    assert p == a.ctx.p == b.ctx.p
+    c1 = normalize_sig(c.c, p)
+    c0 = get_bit_range(c1, 0, 1)
 
-  b0 = normalize_sig(b.c, p)
-  b2 = get_bit_range(b0, 0, k)
-  b1 = get_bit_range(b0, k, p)
-  bk = get_bit_range(b0, k, k+1)
+    b0 = normalize_sig(b.c, p)
+    b2 = get_bit_range(b0, 0, k)
+    b1 = get_bit_range(b0, k, p)
+    bk = get_bit_range(b0, k, k+1)
 
-  a0 = normalize_sig(a.c, p)
-  a3 = get_bit_range(a0, 0, h-k)
-  a2 = get_bit_range(a0, h-k, h)
-  a1 = get_bit_range(a0, h, p)
-  ak = get_bit_range(a0, h, h+1)
-  a32 = get_bit_range(a0, 0, h)
+    a0 = normalize_sig(a.c, p)
+    a3 = get_bit_range(a0, 0, h-k)
+    a2 = get_bit_range(a0, h-k, h)
+    a1 = get_bit_range(a0, h, p)
+    ak = get_bit_range(a0, h, h+1)
+    a32 = get_bit_range(a0, 0, h)
 
-  #stores each of the split bitvectors in an array (there's obviously a nicer way to store this)
-  fpa = [a0,a1,a2,a3,ak,a32]
-  fpb = [b0,b1,b2, bk]
-  fpc = [c1, c0]
-  """  print(bin(a0), bin(a1), bin(a2), bin(a3))
-  print(bin(b0), bin(b1), bin(b2))
-  print(bin(c1))"""
-  return fpa, fpb, fpc
+    # stores each of the split bitvectors in an array (there's obviously a nicer way to store this)
+    fpa = [a0, a1, a2, a3, ak, a32]
+    fpb = [b0, b1, b2, bk]
+    fpc = [c1, c0]
+
+    return fpa, fpb, fpc
+
 
 same, different, total = [0]*50, [0]*50, [0]*50
 evaly, evaln = [0]*50, [0]*50
 
-test =[[0] * 9 for _ in range(5)]
 
 def realpos(fp):
-  return fp.isnormal() and not fp.negative
+    return fp.isnormal() and not fp.negative
+
 
 def realneg(fp):
-  return fp.isnormal() and fp.negative
+    return fp.isnormal() and fp.negative
 
-def check(a,b,c, case, ctx): 
-  # simple function that checks for non-associativity and saves it as an array of the case number 💀
-  total[case] += 1
-  if a.add(b, ctx).add(c, ctx) != a.add(b.add(c, ctx), ctx):
-      different[case] += 1
-      return 1
-  else:
-      same[case] += 1
-      return 0
+
+def check(a, b, c, case, ctx): 
+    # simple function that checks for non-associativity and saves it as an array of the case number 💀
+    total[case] += 1
+    if a.add(b, ctx).add(c, ctx) != a.add(b.add(c, ctx), ctx):
+        different[case] += 1
+        return 1
+    else:
+        same[case] += 1
+        return 0
+
 
 def eval(checks, condition, case):
-  #checks whether the condition from the paper matches with the condition
-  if checks == condition:
-    evaly[case] += 1
-  else:
-    evaln[case] += 1
-  
-  return checks == condition
+    # checks whether the condition from the paper matches with the condition
+    if checks == condition:
+        evaly[case] += 1
+    else:
+        evaln[case] += 1
+    
+    return checks == condition
 
 
 def render_element(e):
     return str(e)
 
-def checkcarry(x,y,n, generated=False):
+def checkcarry(x, y, n, generated=False):
   """  assert (x > 0 and y > 0)
     assert x.bit_length() <= n and y.bit_length() <= n"""
   # x and y must be greater than 0, and the bit length of the two numbers should be less than the length of the significand (depends)#

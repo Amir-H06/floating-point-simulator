@@ -154,9 +154,8 @@ def case1(a, b, c, f8_rtz, p, k, h):
 
 
 def case2(a, b, c, f8_rtz, p, k, h, i, j, l):
-    global checks
-
     totals[2] += 1
+
     if checkcarry(fpb[1], fpc[0], p):  # generate
         if subtractcarry(fpb[1] + fpc[0], fpa[0], p, h):
             # generate
@@ -215,15 +214,6 @@ for l in range(2**nbits):  # range(2**nbits):
 
 
 end = time.time()
-
-mincase = 4
-maxcase = 28
-
-
-"""
-22 58 64
--2 0 1
-0.344 1.62 2.0"""
 
 for i in range(1, 3):
     for j in range(1, len(same[i])):
