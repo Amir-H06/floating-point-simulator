@@ -11,6 +11,6 @@ After getting Titanic to run, load the following files (fpsim.py and fpdebug.py)
 Run the command `python3 -m titanfp.tools.fpsim`, the simulation should start running and you will be printed with all of the cases currently implemented
 
 ### What's left to do:
-* Complete Implementing Case 4 and Case 3 
+* Complete implementing Case 4 and Case 3 
 * Implement multi-threading as it will decrease the time to run quite **significantly**
 * Some other stuff as well
